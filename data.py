@@ -18,7 +18,7 @@ class Data(object):
 				match = re.match("(.*)\|([0-9]*$)", line)
 				line = match.group(1)
 				line = line.split()
-				self.maxLen = max(self.maxLen, len(line))
+				self.maxLength = max(self.maxLength, len(line))
 
 
 	def __str__(self):
