@@ -1,7 +1,9 @@
 import numpy as np 
 import torch 
+import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
+from torch.optim import optim
 
 os.chdir('..')
 from data import Data 
@@ -18,15 +20,16 @@ EMBEDDING_SIZE = 5
 
 
 class Net(nn.Module):
-    def __init__(self, maxLength, batchSize, embedDim, inputSize, weights = None):
+    def __init__(self, maxSentenceLength, embedDim, inputSize, weights = None):
+        
         super(Net, self).__init__()
-        self.input = Variable(torch.tensor())
-        self.batchSize = batchSize
+        
         self.inputSize = inputSize
         self.embedDim = embedDim
-        self.maxLength = maxLength
+        self.maxSentenceLength = maxSentenceLength
         
-        self.setBLSTM()
+        self.input = [Variable(torch.tensor(1, self.embedDim)) for _ in range(self.maxSentenceLength)]
+        self.hiddenParam = Variable(torch.randn(1, 1, self.NUM_HIDDEN)) #fix the dimensions
 
         if not weights:
            self.setBLSTM()
@@ -39,4 +42,7 @@ class Net(nn.Module):
         self.lstm = nn.LSTM(input_size=self.inputSize,hidden_size=NUM_HIDDEN,bidirectional=True,
                         dropout=DROPOUT_RATE, bias=True)
         
-        
+
+
+    def forward(self):
+        pass

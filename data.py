@@ -24,10 +24,13 @@ class Data(object):
 
 	def prepareLabels(self):
 		with open(self.labelFileName, 'r') as file:
-			match = re.match("([0-9]*)\|([0-9]*$)", line)
-			label = int(match.group(2))
-			label = self.getCategory(label)
-			self.labelList.append(label)
+			for line in file: 
+				match = re.match("([0-9]*)\|([0-9]*$)", line)
+				rating = float(match.group(2))
+
+				label = lambda rating: int(rating * 5) # 0 for worst - 4 for best
+
+				self.labelList.append(label(rating))
 
 
 	def prepareData(self):
@@ -41,28 +44,13 @@ class Data(object):
 				match = re.match("(.*)\|([0-9]*$)", line)
 				line = match.group(1)
 				index = int(match.group(2))
-
 				line = line.split()
 
 				self.maxLength = max(self.maxLength, len(line))
 				self.dataList.append(line)
-
 				self.indexList.append(index)
 			
-			self.numSentences = count
-
-
-	def getCategory(self, label): #5 total categories
-		if label <= 0.2: # very negative
-			return 1
-		elif label <= 0.4: # negative
-			return 2
-		elif label <= 0.6: # neutral
-			return 3
-		elif label <= 0.8: # positive
-			return 4
-		else: # very positive
-			return 5			
+			self.numSentences = count	
 
 	
 	def getNextSentence(self):
@@ -75,6 +63,5 @@ class Data(object):
 
 	def getNextLabel(self): 
 		index = self.indexList[self.currentSentenceIndex]
-		label = self.labelList[index]
-		return
+		return self.labelList[index]
 		
