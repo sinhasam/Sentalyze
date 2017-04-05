@@ -27,13 +27,10 @@ class Net(nn.Module):
         self.embedDim = embedDim
         self.maxSentenceLength = maxSentenceLength
         
-        self.input = [Variable(torch.tensor(1, self.embedDim)) for _ in range(self.maxSentenceLength)]
-        self.hiddenParam = Variable(torch.randn(1, 1, self.NUM_HIDDEN)) #fix the dimensions
-
         if not weights:
            self.weights = None
-           self.setLayers()
            self.train = True
+           self.setLayers()
         else: 
             self.weights = weights
 
@@ -42,16 +39,19 @@ class Net(nn.Module):
         self.LSTM = nn.LSTM(input_size=self.inputSize,hidden_size=NUM_HIDDEN,bidirectional=True, 
                         num_layers=1, dropout=DROPOUT_RATE, bias=True)
         
-        self.conv = nn.Conv2d(in_channels=1, out_channels=100, kernel_size=3, bias=True)
+        self.convLayer = nn.Sequential(nn.Conv2d(in_channels=1, out_channels=100, kernel_size=3, bias=True), 
+                                        nn.BatchNorm2d(100),
+                                        nn.ReLU())
+        # nn.Conv2d(in_channels=1, out_channels=100, kernel_size=3, bias=True)
 
         self.maxpool = nn.MaxPool2d(kernel_size=2)
-
+        self.fcLayer = nn.Linear(4455100, NUM_CLASSES) # what the numbers comes out to
         self.softmax = nn.LogSoftmax()
 
 
-    def forward(self):
+    def forward(self, in1):
         # (sequence_length, batch_size, input_size)
-        self.in1 = Variable(torch.randn(self.embedDim, BATCH_SIZE, self.inputSize)) 
+        # self.in1 = Variable(torch.randn(self.embedDim, BATCH_SIZE, self.inputSize)) 
         # (num_layers*2, batch, hidden_size)
         self.hiddenVariable = Variable(torch.randn(2, BATCH_SIZE, NUM_HIDDEN))
         # (num_layers*2, batch, hidden_size)
@@ -59,5 +59,25 @@ class Net(nn.Module):
 
         #states is a tuple with (hidden_states, cell_states)
         self.output, self.states = self.LSTM(self.in1, (self.hiddenVariable, self.cellVariable))
+        
+        dimSize = self.output.size()
+        
+        self.output = self.output.resize(BATCH_SIZE, dimSize[1], dimSize[0], dimSize[2]) # to make it 4d to perform 2 d convolutions
 
-        # self.output = 
+        self.output = self.convLayer(self.output)
+
+        self.output = self.maxpool(self.output)
+        
+        self.output = self.output.view(self.output.size(0), -1)
+
+        self.output = self.softmax(self.output)
+
+
+    
+
+
+
+
+
+
+
