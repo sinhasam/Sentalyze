@@ -11,17 +11,16 @@ class Processing(object):
 
 	def __init__(self, relPath, modelFilename, dataFileName, maxLength):
 		print("Loading " + modelFilename)
-		# self.wordVector = KeyedVectors.load_word2vec_format(modelFilename, binary = True)
+		self.word2Vec = KeyedVectors.load_word2vec_format(modelFilename, binary = True)
 		print("Done loading")
 		self.dataFile = dataFileName
 		self.maxLength = maxLength
 
 
-	@classmethod
 	def sentence2vec(self, *args): # maybe multiple sentence? not sure of the use case
 		for arg in args:
 			sentence = str(arg)
 			for wordCount, word in enumerate(sentence):
 				word2sentence = np.zeros((EMBEDDING_SIZE, self.maxLength))
-				word2sentence[:,wordCount] = self.wordVector[word]
+			word2sentence[:,wordCount] = self.word2Vec[word]
 		return word2sentence, wordCount

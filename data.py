@@ -4,9 +4,9 @@ from preprocessing import Processing
 
 
 class Data(object):
-	def __init__(self, relPath, dataFileName, modelFileName, labelFileName):
+	def __init__(self, relPath, dataFileName, word2VecFileName, labelFileName):
 		self.dataFileName = dataFileName
-		self.modelFileName = modelFileName
+		self.word2VecFileName = word2VecFileName
 		self.relPath = relPath
 		self.labelFileName = labelFileName
 		self.dataList = []
@@ -15,7 +15,7 @@ class Data(object):
 		self.prepareData()
 		self.prepareLabels()
 		self.currentSentenceIndex = 0
-		self.processing = Processing(relPath, self.dataFileName, self.modelFileName, self.maxLength)
+		self.processing = Processing(relPath, self.dataFileName, self.word2VecFileName, self.maxLength)
 
 
 	def __str__(self):
@@ -24,13 +24,16 @@ class Data(object):
 
 	def prepareLabels(self):
 		with open(self.labelFileName, 'r') as file:
-			for line in file: 
-				match = re.match("([0-9]*)\|([0-9]*$)", line)
+			for count, line in enumerate(file): 
+				if count == 0: # the first line is not a label
+					continue
+				print(count)
+				match = re.match("([0-9]*)\|([0-9]*)", line)
 				rating = float(match.group(2))
+				self.labelList.append(rating)
 
-				label = lambda rating: int(rating * 5) # 0 for worst - 4 for best
-
-				self.labelList.append(label(rating))
+			self.labelList = list(map(lambda rating: int(rating * 5), self.labelList)) # 0 for worst - 4 for best
+			
 
 
 	def prepareData(self):

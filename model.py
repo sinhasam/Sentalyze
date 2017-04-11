@@ -3,16 +3,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
-from torch.optim import optim
-
-os.chdir('..')
-from data import Data 
+import torch.optim as optim
 
 
 
-LEARNING_RATE = 1e-3
-EPOCH = 10000
-NUM_CLASSES = 5
 NUM_HIDDEN = 300 
 DROPOUT_RATE = 0.5
 EMBEDDING_SIZE = 5
@@ -20,19 +14,15 @@ BATCH_SIZE = 1
 
 
 class Net(nn.Module):
-    def __init__(self, maxSentenceLength, embedDim, inputSize, weights = None):
+    def __init__(self, maxSentenceLength, inputSize, weights = None):
         
         super(Net, self).__init__()
         self.inputSize = inputSize
-        self.embedDim = embedDim
         self.maxSentenceLength = maxSentenceLength
-        
-        if not weights:
-           self.weights = None
-           self.train = True
-           self.setLayers()
-        else: 
-            self.weights = weights
+        self.weights = None
+
+        self.train = True
+        self.setLayers()
 
 
     def setLayers(self):
@@ -51,27 +41,26 @@ class Net(nn.Module):
 
     def forward(self, in1):
         # (sequence_length, batch_size, input_size)
-        # self.in1 = Variable(torch.randn(self.embedDim, BATCH_SIZE, self.inputSize)) 
         # (num_layers*2, batch, hidden_size)
         self.hiddenVariable = Variable(torch.randn(2, BATCH_SIZE, NUM_HIDDEN))
         # (num_layers*2, batch, hidden_size)
         self.cellVariable = Variable(torch.randn(2, BATCH_SIZE, NUM_HIDDEN))
 
         #states is a tuple with (hidden_states, cell_states)
-        self.output, self.states = self.LSTM(self.in1, (self.hiddenVariable, self.cellVariable))
+        output, states = self.LSTM(in1, (self.hiddenVariable, self.cellVariable))
         
-        dimSize = self.output.size()
+        dimSize = output.size()
         
-        self.output = self.output.resize(BATCH_SIZE, dimSize[1], dimSize[0], dimSize[2]) # to make it 4d to perform 2 d convolutions
+        output = output.resize(BATCH_SIZE, dimSize[1], dimSize[0], dimSize[2]) # to make it 4d to perform 2 d convolutions
 
-        self.output = self.convLayer(self.output)
+        output = self.convLayer(output)
 
-        self.output = self.maxpool(self.output)
+        output = self.maxpool(output)
         
-        self.output = self.output.view(self.output.size(0), -1)
+        output = output.view(output.size(0), -1)
 
-        self.output = self.softmax(self.output)
-
+        output = self.softmax(output)
+        return output
 
     
 
