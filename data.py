@@ -15,7 +15,7 @@ class Data(object):
 		self.prepareData()
 		self.prepareLabels()
 		self.currentSentenceIndex = 0
-		self.processing = Processing(relPath, self.dataFileName, self.word2VecFileName, self.maxLength)
+		self.processing = Processing(self.word2VecFileName, self.maxLength)
 
 
 	def __str__(self):
@@ -27,7 +27,6 @@ class Data(object):
 			for count, line in enumerate(file): 
 				if count == 0: # the first line is not a label
 					continue
-				print(count)
 				match = re.match("([0-9]*)\|([0-9]*)", line)
 				rating = float(match.group(2))
 				self.labelList.append(rating)

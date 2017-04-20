@@ -3,17 +3,13 @@ from gensim.models import KeyedVectors
 import numpy as np
 
 
-
+EMBEDDING_SIZE = 300 # to be decided
 
 class Processing(object):
-	
-	EMBEDDING_SIZE = 300 # to be decided
-
-	def __init__(self, relPath, modelFilename, dataFileName, maxLength):
+	def __init__(self, modelFilename, maxLength):
 		print("Loading " + modelFilename)
 		self.word2Vec = KeyedVectors.load_word2vec_format(modelFilename, binary = True)
 		print("Done loading")
-		self.dataFile = dataFileName
 		self.maxLength = maxLength
 
 

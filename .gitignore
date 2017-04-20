@@ -1,6 +1,6 @@
 #data files to ignore
 imdb_data/*
-
+.DS_Store
 #ignore unit test files
 fun.py
 fun.ipynb
