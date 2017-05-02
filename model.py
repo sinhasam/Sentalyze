@@ -58,7 +58,8 @@ class Net(nn.Module):
 
         output = self.maxpool(output)
         
-        output = output.view(output.size(0), -1)
+        output = output.view(-1, 4455100)
+        output = self.fcLayer(output)
 
         output = self.softmax(output)
         return output
