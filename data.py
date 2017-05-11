@@ -27,12 +27,15 @@ class Data(object):
 			for count, line in enumerate(file): 
 				if count == 0: # the first line is not a label
 					continue
-				match = re.match("([0-9]*)\|([0-9]*)", line)
-				rating = float(match.group(2))
+				match = re.match("([0-9]*)\|(0\.[0-9]*)", line)
+				if not match:
+					rating = 0.9
+				else:
+					rating = float(match.group(2))
+
 				self.labelList.append(rating)
 
 			self.labelList = list(map(lambda rating: int(rating * 5), self.labelList)) # 0 for worst - 4 for best
-			
 
 
 	def prepareData(self):
@@ -53,6 +56,7 @@ class Data(object):
 				self.indexList.append(index)
 			
 			self.numSentences = count	
+			
 
 	
 	def getNextSentence(self):
