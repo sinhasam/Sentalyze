@@ -17,10 +17,13 @@ class Processing(object):
 		for arg in args:
 			sentence = str(arg)
 			numWords = len(sentence)
-			word2sentence = np.zeros((self.maxLength, EMBEDDING_SIZE))
+			word2sentence = np.zeros((1, self.maxLength*EMBEDDING_SIZE))
+			word2sentenceMatrix = np.zeros((self.maxLength, EMBEDDING_SIZE))
 			for count, word in enumerate(sentence):
 				try:
-					word2sentence[count] = self.word2Vec[word]
+					word2sentenceMatrix[count] = self.word2Vec[word]
 				except KeyError as e:
 					continue
-		return word2sentence, count
+			word2sentenceVec = word2sentenceMatrix.reshape(1,-1)
+
+		return word2sentenceVec, count

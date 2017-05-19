@@ -9,7 +9,7 @@ import torch.optim as optim
 
 NUM_HIDDEN = 300 
 DROPOUT_RATE = 0.5
-EMBEDDING_SIZE = 5
+EMBEDDING_SIZE = 300
 BATCH_SIZE = 1
 NUM_FILTERS = 1
 NUM_CLASSES = 5
@@ -18,11 +18,10 @@ OUT_CHANNELS = 100
 
 
 class Net(nn.Module):
-    def __init__(self, maxSentenceLength, inputSize, weights=None):
+    def __init__(self, maxSentenceLength, weights=None):
         
         super(Net, self).__init__()
-        self.inputSize = inputSize
-        self.maxSentenceLength = maxSentenceLength
+        self.inputSize = EMBEDDING_SIZE
         self.weights = None
 
         self.train = True
@@ -32,7 +31,7 @@ class Net(nn.Module):
     def setLayers(self):
         self.LSTM = nn.LSTM(input_size=self.inputSize, hidden_size=NUM_HIDDEN, bidirectional=True, 
                         num_layers=NUM_LAYERS, dropout=DROPOUT_RATE, bias=True)
-        
+     
         self.convLayer = nn.Sequential(nn.Conv2d(in_channels=1, out_channels=OUT_CHANNELS, kernel_size=3, bias=True), 
                                         nn.BatchNorm2d(OUT_CHANNELS),
                                         nn.ReLU())
