@@ -7,7 +7,7 @@ import torch.optim as optim
 
 
 
-NUM_HIDDEN = 300 
+NUM_HIDDEN = 128
 DROPOUT_RATE = 0.5
 EMBEDDING_SIZE = 300
 BATCH_SIZE = 1
@@ -38,26 +38,17 @@ class Net(nn.Module):
 
         self.maxpool = nn.MaxPool2d(kernel_size=2)
 
-        # 299 because embedding dim is with a kernel_stride of 3 results in (300 - 2) = 298 
+        # 299 because embedding dim is with a kernel_stride of 3 results in
         # and 27 because max sentence length is 56 and after the convlayer and maxpool it is 27
-        self.fcLayer = nn.Linear(27*299*OUT_CHANNELS*BATCH_SIZE, NUM_CLASSES) 
+        self.fcLayer = nn.Linear(342900, NUM_CLASSES, bias=True) 
 
         self.softmax = nn.LogSoftmax()
 
 
 
-    def forward(self, in1):
+    def forward(self, in1, hidden):
 
-        # (sequence_length, batch_size, input_size)
-        # (num_layers*2, batch, hidden_size)
-        hiddenVariable = Variable(torch.randn(NUM_LAYERS*2, BATCH_SIZE, NUM_HIDDEN), requires_grad=True) # "*2" is for num_directions which = 2 since it is bidirectional
-        # (num_layers*2, batch, hidden_size)
-        cellVariable = Variable(torch.randn(NUM_LAYERS*2, BATCH_SIZE, NUM_HIDDEN), requires_grad=True)
-
-
-        #states is a tuple with (hidden_states, cell_states)
-        output, _ = self.LSTM(in1, (hiddenVariable, cellVariable))
-        
+        output, hidden = self.LSTM(in1, hidden)
         dimSize = output.size()
         
         output = output.resize(BATCH_SIZE, NUM_FILTERS, dimSize[0], dimSize[2]) # to make it 4d to perform 2 d convolutions
@@ -67,17 +58,8 @@ class Net(nn.Module):
         output = self.maxpool(output)
 
 
-        output = output.view(-1, 27*299*OUT_CHANNELS*BATCH_SIZE)
+        output = output.view(-1, 342900)
 
         output = self.fcLayer(output)
 
-        return self.softmax(output)
-
-    
-
-
-
-
-
-
-
+        return self.softmax(output), hidden
