@@ -46,9 +46,14 @@ class Net(nn.Module):
 
 
 
-    def forward(self, in1, hidden):
+    def forward(self, in1):
+        # (sequence_length, batch_size, input_size)
+        # (num_layers*2, batch, hidden_size)
+        hiddenVariable = nn.Parameter(torch.randn(NUM_LAYERS*2, BATCH_SIZE, NUM_HIDDEN)) # "*2" is for num_directions which = 2 since it is bidirectional
+        # (num_layers*2, batch, hidden_size)
+        cellVariable = nn.Parameter(torch.randn(NUM_LAYERS*2, BATCH_SIZE, NUM_HIDDEN))
 
-        output, hidden = self.LSTM(in1, hidden)
+        output, hidden = self.LSTM(in1, (hiddenVariable, cellVariable))
         dimSize = output.size()
         
         output = output.resize(BATCH_SIZE, NUM_FILTERS, dimSize[0], dimSize[2]) # to make it 4d to perform 2 d convolutions
@@ -62,4 +67,4 @@ class Net(nn.Module):
 
         output = self.fcLayer(output)
 
-        return self.softmax(output), hidden
+        return self.softmax(output)

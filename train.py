@@ -31,15 +31,8 @@ criterion = nn.NLLLoss() # dont need cross entropy since we do softmax in the mo
 optimizer = optim.Adam(model.parameters(), lr = LEARNING_RATE)
 
 
-# (sequence_length, batch_size, input_size)
-# (num_layers*2, batch, hidden_size)
-hiddenVariable = nn.Parameter(torch.randn(NUM_LAYERS*2, BATCH_SIZE, NUM_HIDDEN)) # "*2" is for num_directions which = 2 since it is bidirectional
-# (num_layers*2, batch, hidden_size)
-cellVariable = nn.Parameter(torch.randn(NUM_LAYERS*2, BATCH_SIZE, NUM_HIDDEN))
-
 for epoch in range(NUM_EPOCH):
 	print("On epoch " + str(epoch))
-	hidden = (hiddenVariable, cellVariable)
 	for sentenceCount in range(numSentences):
 		print(sentenceCount)
 		if sentenceCount % 200 == 0:
@@ -54,18 +47,16 @@ for epoch in range(NUM_EPOCH):
 
 		label = Variable(torch.LongTensor([label]))
 
-		
-
 		sentence = np.resize(sentence, (data.maxLength, BATCH_SIZE, EMBEDDING_SIZE))
 		sentence = torch.from_numpy(sentence)
 		sentence = sentence.type(new_type=dtype)
 		sentence = Variable(sentence)
 
-		logProb, hidden = model.forward(sentence, hidden)
+		logProb = model.forward(sentence)
 
 		loss = criterion(logProb, label)
 
-		loss.backward(retain_variables=True)
+		loss.backward()
 		optimizer.step()
 	
 
