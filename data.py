@@ -50,7 +50,6 @@ class Data(object):
 				line = match.group(1)
 				index = int(match.group(2))
 				line = line.split()
-
 				self.maxLength = max(self.maxLength, len(line))
 				self.dataList.append(line)
 				self.indexList.append(index)
