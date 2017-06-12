@@ -16,12 +16,11 @@ class Processing(object):
 
 	def sentence2vec(self, sentence):
 		word2sentenceMatrix = np.zeros((self.maxLength, EMBEDDING_SIZE))
-		print(sentence)
+
 		try:
 			word2sentenceMatrix = [self.word2Vec[word] for word in word_tokenize(str(sentence))]
-
 		except:
-			return None, 0
+			pass
 
 		word2sentenceVec = word2sentenceMatrix.reshape(1,-1)
 
